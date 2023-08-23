@@ -1,7 +1,7 @@
 import { where } from "sequelize";
 import db from "../index";
 import ListData from "./model/indexModel";
-import moment from 'moment'
+import moment from "moment";
 const { Op } = require("sequelize");
 // 选择：select * from table1 where 范围
 // 插入：insert into table1(field1,field2) values(value1,value2)
@@ -34,21 +34,55 @@ export const setJzData = async (params) => {
   };
 };
 
-
 export const getIndxList = async (params) => {
   let code = 200;
   let data = null;
   let message = "";
   try {
-     data = await ListData.findAll({
-      where:{
-        date:{
-          [Op.gte]: '2023-08-01',
-          [Op.lte]: '2023-08-31',
+    data = await ListData.findAll({
+      where: {
+        date: {
+          [Op.gte]: params.month,
+          [Op.lt]: moment(params.month).add(1, "months").format("YYYY-MM"),
+        },
+      },
+    });
+  } catch (err) {
+    code = 500;
+    message = "请求失败";
+  }
+
+  return {
+    code,
+    data,
+    message,
+  };
+};
+
+export const getMonthDetailList = async (params) => {
+  let code = 200;
+  let data =[];
+  let message = "";
+  try {
+   let list = await ListData.findAll({
+      where: {
+        date: {
+          [Op.gte]: params.month,
+          [Op.lt]: moment(params.month).add(1, "months").format("YYYY-MM"),
+        },
+      },
+    });
+    for (let i = 0; i < params.monthDay; i++) {
+      data.push({
+        day: i + 1,
+        dayList: [],
+      });
+      for (let j = 0; j < list.length; j++) {
+        if (i + 1 == moment(list[j].date).date()) {
+          data[i].dayList.push(list[j]);
         }
       }
     }
-    );
   } catch (err) {
     code = 500;
     message = "请求失败";

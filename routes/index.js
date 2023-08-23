@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
-import { setJzData,getIndxList } from "../db/dbIndex/index";
+import { setJzData,getIndxList,getMonthDetailList } from "../db/dbIndex/index";
+import moment from "moment";
 
 /* GET home page. */
 router.post("/setList", async (req, res, next) => {
@@ -14,8 +15,17 @@ router.post("/setList", async (req, res, next) => {
 });
 /* GET home page. */
 router.get("/index/getList", async (req, res, next) => {
-  let {code,data} = await getIndxList(req.body);
-  console.log(data,111)
+  let {code,data} = await getIndxList(req.query);
+  if (code === 200) {
+    res.send({
+      code,
+      data,
+    });
+  }
+});
+
+router.get("/index/getMonthDetailList", async (req, res, next) => {
+  let {code,data} = await getMonthDetailList(req.query);
   if (code === 200) {
     res.send({
       code,
